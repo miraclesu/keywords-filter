@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// db.keywords.insert({word:'xxoo',rate:3})
+	// db.keywords.insert({word:'xxoo',kind:'porn',rate:3})
 	// db.symbols.insert({word:'*', rate:0})
 	loader, err := load.New("mgo.json")
 	if err != nil {

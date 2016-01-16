@@ -72,7 +72,7 @@ func (this *Word) addWord(keyword *Keyword) {
 	for _, v := range keyword.Word {
 		w = w.addNode(&Word{data: v})
 	}
-	w.rate, w.isLeaf = keyword.Rate, true
+	w.rate, w.kind, w.isLeaf = keyword.Rate, keyword.Kind, true
 }
 
 func (this *Word) removeWord(keyword *Keyword) {

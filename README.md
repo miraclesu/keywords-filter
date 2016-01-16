@@ -9,7 +9,8 @@ Install thi package:
 > $ go get github.com/miraclesu/keywords-filter
 
 ## Usage
-    [example](example)
+
+[example](example)
 
 ## License
 
