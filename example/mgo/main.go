@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	// db.keywords.insert({word:'xxoo',rate:3})
+	// db.symbols.insert({word:'*', rate:0})
 	loader, err := load.New("mgo.json")
 	if err != nil {
 		fmt.Printf("new loader err: %s\n", err.Error())
@@ -20,7 +22,7 @@ func main() {
 		return
 	}
 
-	content := "test *Fuc* something"
+	content := "test *xx**oo something"
 	r, _ := f.Filter(content)
 	fmt.Printf("%s is %v\n", content, r)
 }

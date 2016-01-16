@@ -49,15 +49,23 @@ func (this *Word) addNode(word *Word) *Word {
 	return word
 }
 
-func (this *Word) removeNode(word *Word) (*Word, bool) {
+func (this *Word) removeNode(word *Word, isSuffix bool) (*Word, bool) {
 	if len(this.nodes) == 0 {
 		return this, true
 	}
+
 	for k, v := range this.nodes {
+		// find the delete word
 		if v.data == word.data {
-			if len(v.nodes) <= 1 {
-				this.nodes = append(this.nodes[:k], this.nodes[k+1:]...)
-				return this, true
+			// end of the word
+			if isSuffix {
+				if len(v.nodes) == 0 {
+					this.nodes = append(this.nodes[:k], this.nodes[k+1:]...)
+					return v, true
+				} else if v.isLeaf() {
+					v.tag = 0
+					return v, true
+				}
 			} else {
 				return v, false
 			}
@@ -75,8 +83,10 @@ func (this *Word) addWord(keyword *Keyword) {
 
 func (this *Word) removeWord(keyword *Keyword) {
 	ok, word := false, this
-	for _, v := range keyword.Word {
-		if word, ok = word.removeNode(&Word{data: v}); ok {
+	runes := []rune(keyword.Word)
+	count := len(runes) - 1
+	for k, v := range keyword.Word {
+		if word, ok = word.removeNode(&Word{data: v}, k == count); ok {
 			break
 		}
 	}

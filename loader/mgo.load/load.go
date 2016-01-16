@@ -12,7 +12,8 @@ import (
 )
 
 type Loader struct {
-	Collection string
+	KeywordsColl string
+	SymbolsColl  string
 	*mgo.DialInfo
 	*mgo.Session
 }
@@ -34,8 +35,12 @@ func New(path string) (loader *Loader, err error) {
 	return
 }
 
-func (this *Loader) Load() (kws []*keyword.Keyword, err error) {
-	c := this.DB(this.Database).C(this.Collection)
-	err = c.Find(bson.M{}).All(&kws)
+func (this *Loader) Load() (kws []*keyword.Keyword, sbs []*keyword.Keyword, err error) {
+	db := this.DB(this.Database)
+	if err = db.C(this.KeywordsColl).Find(bson.M{}).All(&kws); err != nil {
+		return
+	}
+
+	err = db.C(this.SymbolsColl).Find(bson.M{}).All(&sbs)
 	return
 }

@@ -3,6 +3,7 @@
         "127.0.0.1:27017"
     ],
     "Database": "kwf",
-    "Collection": "keywords",
+    "KeywordsColl": "keywords",
+    "SymbolsColl": "symbols",
     "Timeout": 5000000000
 }

@@ -12,27 +12,30 @@ var (
 )
 
 type Filter struct {
-	word      *Word
+	word      *Word    // keyword
+	symb      *symbols // special symbols
 	Threshold int16
 }
 
 func New(threshold int16, load loader.Loader) (f *Filter, err error) {
-	kws, err := load.Load()
+	kws, sbs, err := load.Load()
 	if err != nil {
 		return
 	}
 
 	f = &Filter{
 		word:      new(Word),
+		symb:      new(symbols),
 		Threshold: threshold,
 	}
 
 	f.AddWords(kws)
+	f.AddSymbs(sbs)
 	return
 }
 
 func (this *Filter) Filter(content string) (b bool, err error) {
-	if this.word == nil {
+	if this.word == nil || this.symb == nil {
 		err = InvalidFilter
 		return
 	}
@@ -56,5 +59,29 @@ func (this *Filter) RemoveWord(w *Keyword) {
 func (this *Filter) AddWords(kws []*Keyword) {
 	for i, count := 0, len(kws); i < count; i++ {
 		this.AddWord(kws[i])
+	}
+}
+
+func (this *Filter) AddSymb(w *Keyword) {
+	if this.symb == nil {
+		this.symb = new(symbols)
+	}
+	for _, v := range w.Word {
+		this.symb.add(v)
+	}
+}
+
+func (this *Filter) RemoveSymb(w *Keyword) {
+	if this.word == nil {
+		return
+	}
+	for _, v := range w.Word {
+		this.symb.remove(v)
+	}
+}
+
+func (this *Filter) AddSymbs(sbs []*Keyword) {
+	for i, count := 0, len(sbs); i < count; i++ {
+		this.AddSymb(sbs[i])
 	}
 }

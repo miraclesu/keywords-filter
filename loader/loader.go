@@ -5,5 +5,5 @@ import (
 )
 
 type Loader interface {
-	Load() ([]*Keyword, error)
+	Load() ([]*Keyword, []*Keyword, error)
 }
