@@ -24,5 +24,5 @@ func main() {
 
 	content := "test *xx**oo something"
 	r, _ := f.Filter(content)
-	fmt.Printf("%s is %v\n", content, r)
+	fmt.Printf("%s is %+v\n", content, r)
 }

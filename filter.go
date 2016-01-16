@@ -34,7 +34,7 @@ func New(threshold int, load loader.Loader) (f *Filter, err error) {
 	return
 }
 
-func (this *Filter) Filter(content string) (b bool, err error) {
+func (this *Filter) Filter(content string) (resp *Response, err error) {
 	if this.word == nil || this.symb == nil {
 		err = InvalidFilter
 		return

@@ -1,27 +1,37 @@
 package filter
 
+import (
+	. "github.com/miraclesu/keywords-filter/keyword"
+)
+
 type Request struct {
 	filter  *Filter
 	content []rune
-	rate    int
+
+	*Response
 }
 
 func NewRequest(filter *Filter, content string) *Request {
+	threshold := filter.Threshold
 	return &Request{
 		filter:  filter,
 		content: []rune(content),
+
+		Response: &Response{
+			Threshold: threshold,
+		},
 	}
 }
 
-func (this *Request) scan() bool {
+func (this *Request) scan() *Response {
 	for i := 0; i < len(this.content); i++ {
 		if node := this.trigger(this.content[i]); node != nil {
 			if this.search(node, i) {
-				return true
+				break
 			}
 		}
 	}
-	return false
+	return this.Response
 }
 
 func (this *Request) trigger(data rune) *Word {
@@ -53,9 +63,16 @@ func (this *Request) search(node *Word, index int) bool {
 }
 
 func (this *Request) check(node *Word, index, i int) bool {
-	if node != nil && node.isLeaf {
-		this.rate += node.rate
-		return this.rate >= this.filter.Threshold
+	if node == nil || !node.isLeaf {
+		return false
 	}
-	return false
+
+	this.Rate += node.rate
+	this.Keywords = append(this.Keywords, Keyword{
+		Rate:  node.rate,
+		Index: index,
+		Kind:  node.kind,
+		Word:  string(this.content[index : index+i+1]),
+	})
+	return this.Rate >= this.filter.Threshold
 }

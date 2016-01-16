@@ -10,6 +10,7 @@ type Word struct {
 	nodes  []*Word
 	data   rune
 	rate   int
+	kind   string
 	isLeaf bool
 }
 

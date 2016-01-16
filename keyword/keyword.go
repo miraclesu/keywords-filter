@@ -1,6 +1,8 @@
 package keyword
 
 type Keyword struct {
-	Word string
-	Rate int
+	Rate  int
+	Index int
+	Kind  string
+	Word  string
 }
