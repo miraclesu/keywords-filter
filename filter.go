@@ -14,10 +14,10 @@ var (
 type Filter struct {
 	word      *Word    // keyword
 	symb      *symbols // special symbols
-	Threshold int16
+	Threshold int
 }
 
-func New(threshold int16, load loader.Loader) (f *Filter, err error) {
+func New(threshold int, load loader.Loader) (f *Filter, err error) {
 	kws, sbs, err := load.Load()
 	if err != nil {
 		return
@@ -39,7 +39,7 @@ func (this *Filter) Filter(content string) (b bool, err error) {
 		err = InvalidFilter
 		return
 	}
-	return NewResponse(this, content).scan(), nil
+	return NewRequest(this, content).scan(), nil
 }
 
 func (this *Filter) AddWord(w *Keyword) {

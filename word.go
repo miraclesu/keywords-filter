@@ -6,15 +6,11 @@ import (
 	. "github.com/miraclesu/keywords-filter/keyword"
 )
 
-const (
-	Leaf = -1
-)
-
 type Word struct {
-	nodes []*Word
-	data  rune
-	rate  int16
-	tag   int8
+	nodes  []*Word
+	data   rune
+	rate   int
+	isLeaf bool
 }
 
 func (this *Word) search(data rune) *Word {
@@ -26,10 +22,6 @@ func (this *Word) search(data rune) *Word {
 		return this.nodes[index]
 	}
 	return nil
-}
-
-func (this *Word) isLeaf() bool {
-	return this.tag == Leaf
 }
 
 func (this *Word) addNode(word *Word) *Word {
@@ -62,8 +54,8 @@ func (this *Word) removeNode(word *Word, isSuffix bool) (*Word, bool) {
 				if len(v.nodes) == 0 {
 					this.nodes = append(this.nodes[:k], this.nodes[k+1:]...)
 					return v, true
-				} else if v.isLeaf() {
-					v.tag = 0
+				} else if v.isLeaf {
+					v.isLeaf = false
 					return v, true
 				}
 			} else {
@@ -75,10 +67,11 @@ func (this *Word) removeNode(word *Word, isSuffix bool) (*Word, bool) {
 }
 
 func (this *Word) addWord(keyword *Keyword) {
+	w := this
 	for _, v := range keyword.Word {
-		this = this.addNode(&Word{data: v})
+		w = w.addNode(&Word{data: v})
 	}
-	this.rate, this.tag = keyword.Rate, Leaf
+	w.rate, w.isLeaf = keyword.Rate, true
 }
 
 func (this *Word) removeWord(keyword *Keyword) {

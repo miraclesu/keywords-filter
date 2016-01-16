@@ -1,19 +1,19 @@
 package filter
 
-type Response struct {
+type Request struct {
 	filter  *Filter
 	content []rune
-	rate    int16
+	rate    int
 }
 
-func NewResponse(filter *Filter, content string) *Response {
-	return &Response{
+func NewRequest(filter *Filter, content string) *Request {
+	return &Request{
 		filter:  filter,
 		content: []rune(content),
 	}
 }
 
-func (this *Response) scan() bool {
+func (this *Request) scan() bool {
 	for i := 0; i < len(this.content); i++ {
 		if node := this.trigger(this.content[i]); node != nil {
 			if this.search(node, i) {
@@ -24,11 +24,11 @@ func (this *Response) scan() bool {
 	return false
 }
 
-func (this *Response) trigger(data rune) *Word {
+func (this *Request) trigger(data rune) *Word {
 	return this.filter.word.search(data)
 }
 
-func (this *Response) search(node *Word, index int) bool {
+func (this *Request) search(node *Word, index int) bool {
 	//only one word
 	if this.check(node, index, 0) {
 		return true
@@ -52,8 +52,8 @@ func (this *Response) search(node *Word, index int) bool {
 	return false
 }
 
-func (this *Response) check(node *Word, index, i int) bool {
-	if node != nil && node.isLeaf() {
+func (this *Request) check(node *Word, index, i int) bool {
+	if node != nil && node.isLeaf {
 		this.rate += node.rate
 		return this.rate >= this.filter.Threshold
 	}
