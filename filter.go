@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	. "github.com/miraclesu/keywords-filter/keyword"
+	"github.com/miraclesu/keywords-filter/listener"
 	"github.com/miraclesu/keywords-filter/loader"
 )
 
@@ -62,6 +63,12 @@ func (this *Filter) AddWords(kws []*Keyword) {
 	}
 }
 
+func (this *Filter) RemoveWords(kws []*Keyword) {
+	for i, count := 0, len(kws); i < count; i++ {
+		this.RemoveWord(kws[i])
+	}
+}
+
 func (this *Filter) AddSymb(w *Keyword) {
 	if this.symb == nil {
 		this.symb = new(symbols)
@@ -84,4 +91,33 @@ func (this *Filter) AddSymbs(sbs []*Keyword) {
 	for i, count := 0, len(sbs); i < count; i++ {
 		this.AddSymb(sbs[i])
 	}
+}
+
+func (this *Filter) RemoveSymbs(sbs []*Keyword) {
+	for i, count := 0, len(sbs); i < count; i++ {
+		this.AddSymb(sbs[i])
+	}
+}
+
+func (this *Filter) StartListen(listen listener.Listener) {
+	go func() {
+		for kws := range listen.AddKeywords() {
+			this.AddWords(kws)
+		}
+	}()
+	go func() {
+		for kws := range listen.RemoveKeywords() {
+			this.RemoveWords(kws)
+		}
+	}()
+	go func() {
+		for kws := range listen.AddSymbols() {
+			this.AddSymbs(kws)
+		}
+	}()
+	go func() {
+		for kws := range listen.RemoveSymbols() {
+			this.RemoveSymbs(kws)
+		}
+	}()
 }
