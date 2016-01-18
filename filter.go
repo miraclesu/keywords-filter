@@ -69,31 +69,31 @@ func (this *Filter) RemoveWords(kws []*Keyword) {
 	}
 }
 
-func (this *Filter) AddSymb(w *Keyword) {
+func (this *Filter) AddSymb(s string) {
 	if this.symb == nil {
 		this.symb = new(symbols)
 	}
-	for _, v := range w.Word {
+	for _, v := range s {
 		this.symb.add(v)
 	}
 }
 
-func (this *Filter) RemoveSymb(w *Keyword) {
+func (this *Filter) RemoveSymb(s string) {
 	if this.word == nil {
 		return
 	}
-	for _, v := range w.Word {
+	for _, v := range s {
 		this.symb.remove(v)
 	}
 }
 
-func (this *Filter) AddSymbs(sbs []*Keyword) {
+func (this *Filter) AddSymbs(sbs []string) {
 	for i, count := 0, len(sbs); i < count; i++ {
 		this.AddSymb(sbs[i])
 	}
 }
 
-func (this *Filter) RemoveSymbs(sbs []*Keyword) {
+func (this *Filter) RemoveSymbs(sbs []string) {
 	for i, count := 0, len(sbs); i < count; i++ {
 		this.AddSymb(sbs[i])
 	}

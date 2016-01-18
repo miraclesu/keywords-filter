@@ -35,12 +35,29 @@ func New(path string) (loader *Loader, err error) {
 	return
 }
 
-func (this *Loader) Load() (kws []*keyword.Keyword, sbs []*keyword.Keyword, err error) {
+func (this *Loader) Load() (kws []*keyword.Keyword, sbs []string, err error) {
 	db := this.DB(this.Database)
 	if err = db.C(this.KeywordsColl).Find(bson.M{}).All(&kws); err != nil {
 		return
 	}
 
-	err = db.C(this.SymbolsColl).Find(bson.M{}).All(&sbs)
+	sbws := make([]keyword.Keyword, 0)
+	if err = db.C(this.SymbolsColl).Find(bson.M{}).All(&sbws); err != nil {
+		return
+	}
+
+	count := len(sbws)
+	if count == 0 {
+		return
+	}
+
+	sbs = make([]string, 0, count)
+	for i := 0; i < count; i++ {
+		if len(sbws[i].Word) == 0 {
+			continue
+		}
+
+		sbs = append(sbs, sbws[i].Word)
+	}
 	return
 }

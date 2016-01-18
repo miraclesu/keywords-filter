@@ -7,6 +7,6 @@ import (
 type Listener interface {
 	AddKeywords() <-chan []*Keyword
 	RemoveKeywords() <-chan []*Keyword
-	AddSymbols() <-chan []*Keyword
-	RemoveSymbols() <-chan []*Keyword
+	AddSymbols() <-chan []string
+	RemoveSymbols() <-chan []string
 }

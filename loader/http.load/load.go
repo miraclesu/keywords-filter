@@ -7,6 +7,6 @@ import (
 type Loader struct {
 }
 
-func (this *Loader) Load() (kws []*Keyword, sbs []*Keyword, err error) {
+func (this *Loader) Load() (kws []*Keyword, sbs []string, err error) {
 	return
 }
