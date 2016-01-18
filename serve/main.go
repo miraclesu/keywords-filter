@@ -5,7 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/julienschmidt/httprouter"
+
 	"github.com/miraclesu/keywords-filter"
 	"github.com/miraclesu/keywords-filter/listener/http.listen"
 	"github.com/miraclesu/keywords-filter/loader/http.load"
@@ -30,13 +31,12 @@ func main() {
 
 	Filter.StartListen(listen.NewListener())
 
-	r := mux.NewRouter()
-	r.HandleFunc("/filter", filterHandler).
-		Methods("POST")
+	router := httprouter.New()
+	router.POST("/filter", filterHandler)
 	log.Println("serve listen on", *Port)
-	http.ListenAndServe(*Port, r)
+	http.ListenAndServe(*Port, router)
 }
 
-func filterHandler(w http.ResponseWriter, r *http.Request) {
+func filterHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 }
