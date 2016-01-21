@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
@@ -29,14 +30,34 @@ func main() {
 		return
 	}
 
-	Filter.StartListen(listen.NewListener())
+	Filter.StartListen(listen.DefaultListener)
 
 	router := httprouter.New()
 	router.POST("/filter", filterHandler)
+	router.POST("/addkws", listen.AddKeywords)
 	log.Println("serve listen on", *Port)
 	http.ListenAndServe(*Port, router)
 }
 
-func filterHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+type Response struct {
+	Sucess bool
+	Msg    string
+	Result *filter.Response `json:",omitempty"`
+}
 
+func filterHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+	req, resp := new(filter.Request), new(Response)
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		resp.Msg = err.Error()
+		data, _ := json.Marshal(resp)
+		w.Write(data)
+		return
+	}
+
+	req.Init(Filter)
+	resp.Result, resp.Sucess = req.Scan(), true
+	data, _ := json.Marshal(resp)
+	w.Write(data)
 }

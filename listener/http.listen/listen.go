@@ -2,6 +2,10 @@ package listen
 
 import . "github.com/miraclesu/keywords-filter/keyword"
 
+var (
+	DefaultListener = NewListener()
+)
+
 type Listener struct {
 	AddKeywordsChan    chan []*Keyword
 	RemoveKeywordsChan chan []*Keyword

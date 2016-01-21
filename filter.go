@@ -40,7 +40,12 @@ func (this *Filter) Filter(content string) (resp *Response, err error) {
 		err = InvalidFilter
 		return
 	}
-	return NewRequest(this, content).scan(), nil
+
+	req := Request{
+		Content: content,
+	}
+	req.Init(this)
+	return req.Scan(), nil
 }
 
 func (this *Filter) AddWord(w *Keyword) {

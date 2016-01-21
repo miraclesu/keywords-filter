@@ -7,23 +7,19 @@ import (
 type Request struct {
 	filter  *Filter
 	content []rune
+	Content string
 
 	*Response
 }
 
-func NewRequest(filter *Filter, content string) *Request {
-	threshold := filter.Threshold
-	return &Request{
-		filter:  filter,
-		content: []rune(content),
-
-		Response: &Response{
-			Threshold: threshold,
-		},
+func (this *Request) Init(filter *Filter) {
+	this.filter, this.content = filter, []rune(this.Content)
+	this.Response = &Response{
+		Threshold: filter.Threshold,
 	}
 }
 
-func (this *Request) scan() *Response {
+func (this *Request) Scan() *Response {
 	for i := 0; i < len(this.content); i++ {
 		if node := this.trigger(this.content[i]); node != nil {
 			if this.search(node, i) {
