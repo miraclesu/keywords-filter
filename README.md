@@ -10,7 +10,7 @@ Install thi package:
 
 ## Usage
 
-[example](example)
+[examples](examples)
 
 ## License
 

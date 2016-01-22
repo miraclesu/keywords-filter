@@ -8,15 +8,15 @@ import (
 )
 
 func main() {
-	// db.keywords.insert({word:'xxoo',kind:'porn',rate:3})
-	// db.symbols.insert({word:'*', rate:0})
+	// db.keywords.insert({word:'xxoo',kind:'porn',rate:100})
+	// db.symbols.insert({word:'*'})
 	loader, err := load.New("mgo.json")
 	if err != nil {
 		fmt.Printf("new loader err: %s\n", err.Error())
 		return
 	}
 
-	f, err := filter.New(1, loader)
+	f, err := filter.New(100, loader)
 	if err != nil {
 		fmt.Printf("new filter err: %s\n", err.Error())
 		return
