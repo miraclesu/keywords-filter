@@ -4,6 +4,7 @@ package load
 import (
 	"encoding/json"
 	"os"
+	"time"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -30,6 +31,7 @@ func New(path string) (loader *Loader, err error) {
 	if err = json.NewDecoder(file).Decode(loader); err != nil {
 		return
 	}
+	loader.Timeout *= time.Second
 
 	loader.Session, err = mgo.DialWithInfo(loader.DialInfo)
 	return

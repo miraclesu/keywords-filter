@@ -11,6 +11,7 @@ Install thi package:
 ## Usage
 
 [examples](examples)
+[service](serve)
 
 ## License
 
