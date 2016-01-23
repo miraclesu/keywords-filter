@@ -11,8 +11,10 @@ import (
 type Conf struct {
 	NetWork string
 	Address string
-	Channel string
 	Timeout int
+
+	KwsChannel string
+	SbsChannel string
 }
 
 func NewConf(path string) (conf *Conf, err error) {

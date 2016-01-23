@@ -2,13 +2,18 @@ package listen
 
 import (
 	"encoding/json"
+
+	. "github.com/miraclesu/keywords-filter/keyword"
 )
 
 const (
-	AddKws = iota + 1
-	RmKws
-	AddSbs
-	RmSbs
+	ADD = iota + 1
+	RM
+)
+
+const (
+	KW = iota + 1
+	SB
 )
 
 type Notify struct {
@@ -16,8 +21,14 @@ type Notify struct {
 	Data   interface{}
 }
 
-func NewNotify(data []byte) (n *Notify, err error) {
+func NewNotify(kind int, data []byte) (n *Notify, err error) {
 	n = new(Notify)
+	if kind == KW {
+		n.Data = new([]*Keyword)
+	} else {
+		n.Data = new([]string)
+	}
+
 	err = json.Unmarshal(data, n)
 	return
 }
