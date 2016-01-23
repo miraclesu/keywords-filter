@@ -10,12 +10,12 @@ Install thi package:
 
 ## Usage
 
-[examples](examples)
-[service](serve)
+* [examples](examples)
+* [service](serve)
 
 ## Note
 
-you can implement other loaders(eg. mysql, postgresql...) and listener(eg. nsq, rabbitmq...) for the filter.
+you can implement other loaders(eg. mysql, postgresql...) and listeners(eg. nsq, rabbitmq...) for the filter.
 
 ## License
 
