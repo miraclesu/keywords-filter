@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/miraclesu/keywords-filter"
-	"github.com/miraclesu/keywords-filter/listener/http.listen"
+	"github.com/miraclesu/keywords-filter/listener/redis.listen"
 	"github.com/miraclesu/keywords-filter/loader/mgo.load"
 )
 
@@ -33,6 +33,12 @@ func main() {
 		return
 	}
 
+	listener, err := listen.New(*ListenConf)
+	if err != nil {
+		log.Printf("new listener err: %s\n", err.Error())
+		return
+	}
+
 	Filter, err = filter.New(*Threshold, loader)
 	if err != nil {
 		log.Printf("new filter err: %s\n", err.Error())
@@ -40,19 +46,23 @@ func main() {
 	}
 	loader.Session.Close()
 
-	Filter.StartListen(listen.DefaultListener)
+	Filter.StartListen(listener)
 
 	router := httprouter.New()
 	router.POST("/filter", filterHandler)
-	router.POST("/addkws", listen.AddKeywords)
-	router.POST("/addsbs", listen.AddSymbols)
 	log.Println("serve listen on", *Port)
 	http.ListenAndServe(*Port, router)
 }
 
+type Response struct {
+	Success bool
+	Msg     string
+	Result  *filter.Response `json:",omitempty"`
+}
+
 func filterHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
-	req, resp := new(filter.Request), new(listen.Response)
+	req, resp := new(filter.Request), new(Response)
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		resp.Msg = err.Error()

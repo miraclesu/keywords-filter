@@ -5,6 +5,6 @@
     "Database": "kwf",
     "KeywordsColl": "keywords",
     "SymbolsColl": "symbols",
-	"#Timeout":"connection timeout, unit/s",
+	"#Timeout":"connect timeout, unit/s",
     "Timeout": 5
 }
