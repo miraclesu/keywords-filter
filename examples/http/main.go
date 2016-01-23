@@ -36,6 +36,8 @@ func main() {
 	router.POST("/filter", filterHandler)
 	router.POST("/addkws", listen.AddKeywords)
 	router.POST("/addsbs", listen.AddSymbols)
+	router.POST("/rmkws", listen.RemoveKeywords)
+	router.POST("/rmsbs", listen.RemoveSymbols)
 	log.Println("serve listen on", *Port)
 	http.ListenAndServe(*Port, router)
 }

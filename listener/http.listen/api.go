@@ -17,33 +17,50 @@ type Response struct {
 }
 
 func AddKeywords(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	w.Header().Set("Content-Type", "application/json")
-	kws, resp := make([]*Keyword, 0), new(Response)
-	err := json.NewDecoder(r.Body).Decode(&kws)
-	if err != nil {
-		resp.Msg = err.Error()
-		data, _ := json.Marshal(resp)
-		w.Write(data)
+	kws := make([]*Keyword, 0)
+	if err := Do(w, r, &kws); err != nil {
 		return
 	}
 	DefaultListener.AddKeywordsChan <- kws
-	resp.Success = true
-	data, _ := json.Marshal(resp)
-	w.Write(data)
+}
+
+func RemoveKeywords(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	kws := make([]*Keyword, 0)
+	if err := Do(w, r, &kws); err != nil {
+		return
+	}
+	DefaultListener.RemoveKeywordsChan <- kws
 }
 
 func AddSymbols(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	sbs := make([]string, 0)
+	if err := Do(w, r, &sbs); err != nil {
+		return
+	}
+	DefaultListener.AddSymbolsChan <- sbs
+}
+
+func RemoveSymbols(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	sbs := make([]string, 0)
+	if err := Do(w, r, &sbs); err != nil {
+		return
+	}
+	DefaultListener.RemoveSymbolsChan <- sbs
+}
+
+func Do(w http.ResponseWriter, r *http.Request, body interface{}) (err error) {
 	w.Header().Set("Content-Type", "application/json")
-	sbs, resp := make([]string, 0), new(Response)
-	err := json.NewDecoder(r.Body).Decode(&sbs)
+	resp := new(Response)
+	err = json.NewDecoder(r.Body).Decode(body)
 	if err != nil {
 		resp.Msg = err.Error()
 		data, _ := json.Marshal(resp)
 		w.Write(data)
 		return
 	}
-	DefaultListener.AddSymbolsChan <- sbs
+
 	resp.Success = true
 	data, _ := json.Marshal(resp)
 	w.Write(data)
+	return
 }

@@ -38,6 +38,7 @@ func main() {
 		log.Printf("new filter err: %s\n", err.Error())
 		return
 	}
+	loader.Session.Close()
 
 	Filter.StartListen(listen.DefaultListener)
 
