@@ -1,44 +1,60 @@
 package filter
 
 import (
-    "sort"
+	"sort"
+	"sync"
 )
 
-type symbols []rune
+type symbols struct {
+	lk   *sync.RWMutex
+	data []rune
+}
 
 // 二分查找数组内的元素，中文的得用rune类型而不是byte
 func (s *symbols) search(r rune) (b bool, index int) {
-    if len(*s) == 0 {
-        return false, 0
-    }
-    index = sort.Search(len(*s)-1, func(i int) bool { return (*s)[i] >= r })
-    b = (*s)[index] == r
-    return
+	s.lk.RLock()
+	data := s.data
+	s.lk.RUnlock()
+
+	if len(data) == 0 {
+		return false, 0
+	}
+	index = sort.Search(len(data)-1, func(i int) bool { return data[i] >= r })
+	b = data[index] == r
+	return
 }
 
 // 往有序的数组内插入一个元素
 func (s *symbols) add(r rune) {
-    b, index := s.search(r)
-    if b {
-        return
-    }
-    if len(*s) == 0 {
-        *s = append(*s, r)
-        return
-    }
-    if (*s)[index] > r {
-        *s = append((*s)[:index], append([]rune{r}, (*s)[index:]...)...)
-        return
-    }
-    *s = append((*s)[:index+1], append([]rune{r}, (*s)[index+1:]...)...)
+	b, index := s.search(r)
+	if b {
+		return
+	}
+
+	data := s.data
+	if len(data) == 0 {
+		data = append(data, r)
+	} else if (data)[index] > r {
+		data = append(data[:index], append([]rune{r}, data[index:]...)...)
+	}
+	data = append(data[:index+1], append([]rune{r}, data[index+1:]...)...)
+
+	s.lk.Lock()
+	s.data = data
+	s.lk.Unlock()
 }
 
 // 删除一个元素
 func (s *symbols) remove(r rune) {
-    if len(*s) == 0 {
-        return
-    }
-    if b, index := s.search(r); b {
-        *s = append((*s)[:index], (*s)[index+1:]...)
-    }
+	data := s.data
+	if len(data) == 0 {
+		return
+	}
+	if b, index := s.search(r); b {
+		data = append(data[:index], data[index+1:]...)
+	}
+
+	s.lk.Lock()
+	s.data = data
+	s.lk.Unlock()
 }

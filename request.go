@@ -50,7 +50,11 @@ func (this *Request) search(node *Word, index int) bool {
 			//is not keyword, break
 			break
 		}
-		if this.check(tmpNode, index, i) {
+
+		tmpNode.lk.RLock()
+		ok := this.check(tmpNode, index, i)
+		tmpNode.lk.RUnlock()
+		if ok {
 			return true
 		}
 		node = tmpNode

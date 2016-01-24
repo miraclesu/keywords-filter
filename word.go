@@ -2,11 +2,13 @@ package filter
 
 import (
 	"sort"
+	"sync"
 
 	. "github.com/miraclesu/keywords-filter/keyword"
 )
 
 type Word struct {
+	lk     *sync.RWMutex
 	nodes  []*Word
 	data   rune
 	rate   int
@@ -26,6 +28,9 @@ func (this *Word) search(data rune) *Word {
 }
 
 func (this *Word) addNode(word *Word) *Word {
+	this.lk.Lock()
+	defer this.lk.Unlock()
+
 	if len(this.nodes) == 0 {
 		this.nodes = append(this.nodes, word)
 		return word
@@ -43,6 +48,9 @@ func (this *Word) addNode(word *Word) *Word {
 }
 
 func (this *Word) removeNode(word *Word, isSuffix bool) (*Word, bool) {
+	this.lk.Lock()
+	defer this.lk.Unlock()
+
 	if len(this.nodes) == 0 {
 		return this, true
 	}
@@ -70,9 +78,12 @@ func (this *Word) removeNode(word *Word, isSuffix bool) (*Word, bool) {
 func (this *Word) addWord(keyword *Keyword) {
 	w := this
 	for _, v := range keyword.Word {
-		w = w.addNode(&Word{data: v})
+		w = w.addNode(&Word{lk: new(sync.RWMutex), data: v})
 	}
+
+	w.lk.Lock()
 	w.rate, w.kind, w.isLeaf = keyword.Rate, keyword.Kind, true
+	w.lk.Unlock()
 }
 
 func (this *Word) removeWord(keyword *Keyword) {

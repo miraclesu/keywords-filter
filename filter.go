@@ -2,6 +2,7 @@ package filter
 
 import (
 	"errors"
+	"sync"
 
 	. "github.com/miraclesu/keywords-filter/keyword"
 	"github.com/miraclesu/keywords-filter/listener"
@@ -25,8 +26,8 @@ func New(threshold int, load loader.Loader) (f *Filter, err error) {
 	}
 
 	f = &Filter{
-		word:      new(Word),
-		symb:      new(symbols),
+		word:      &Word{lk: new(sync.RWMutex)},
+		symb:      &symbols{lk: new(sync.RWMutex)},
 		Threshold: threshold,
 	}
 
@@ -50,7 +51,9 @@ func (this *Filter) Filter(content string) (resp *Response, err error) {
 
 func (this *Filter) AddWord(w *Keyword) {
 	if this.word == nil {
-		this.word = new(Word)
+		this.word = &Word{
+			lk: new(sync.RWMutex),
+		}
 	}
 	this.word.addWord(w)
 }
@@ -76,7 +79,9 @@ func (this *Filter) RemoveWords(kws []*Keyword) {
 
 func (this *Filter) AddSymb(s string) {
 	if this.symb == nil {
-		this.symb = new(symbols)
+		this.symb = &symbols{
+			lk: new(sync.RWMutex),
+		}
 	}
 	for _, v := range s {
 		this.symb.add(v)
