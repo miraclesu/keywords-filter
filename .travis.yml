@@ -1,0 +1,11 @@
+language: go
+sudo: false
+go:
+  - 1.5
+  - tip
+before_install:
+  - go get gopkg.in/mgo.v2
+  - go get gopkg.in/mgo.v2/bson
+  - go get github.com/garyburd/redigo/redis
+script:
+  - go test -v ./...
