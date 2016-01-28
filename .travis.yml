@@ -8,4 +8,5 @@ before_install:
   - go get gopkg.in/mgo.v2/bson
   - go get github.com/garyburd/redigo/redis
 script:
+  - golint
   - go test -v ./...

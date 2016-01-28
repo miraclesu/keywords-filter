@@ -23,6 +23,6 @@ func main() {
 	}
 
 	content := "test *xx**oo something"
-	r, _ := f.Filter(content)
-	fmt.Printf("%s is %+v\n", content, r)
+	resp := f.Filter(content)
+	fmt.Printf("%s is %+v\n", content, resp)
 }

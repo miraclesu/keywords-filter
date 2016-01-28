@@ -1,9 +1,10 @@
 package filter
 
 import (
-	. "github.com/miraclesu/keywords-filter/keyword"
+	"github.com/miraclesu/keywords-filter/keyword"
 )
 
+// Request is used to build a request for a content test
 type Request struct {
 	filter  *Filter
 	content []rune
@@ -12,39 +13,41 @@ type Request struct {
 	*Response
 }
 
-func (this *Request) Init(filter *Filter) {
-	this.filter, this.content = filter, []rune(this.Content)
-	this.Response = &Response{
+// Init will init the request
+func (r *Request) Init(filter *Filter) {
+	r.filter, r.content = filter, []rune(r.Content)
+	r.Response = &Response{
 		Threshold: filter.Threshold,
 	}
 }
 
-func (this *Request) Scan() *Response {
-	for i := 0; i < len(this.content); i++ {
-		if node := this.trigger(this.content[i]); node != nil {
-			if this.search(node, i) {
+// Scan the content and return the filter result
+func (r *Request) Scan() *Response {
+	for i := 0; i < len(r.content); i++ {
+		if node := r.trigger(r.content[i]); node != nil {
+			if r.search(node, i) {
 				break
 			}
 		}
 	}
-	return this.Response
+	return r.Response
 }
 
-func (this *Request) trigger(data rune) *Word {
-	return this.filter.word.search(data)
+func (r *Request) trigger(data rune) *Word {
+	return r.filter.word.search(data)
 }
 
-func (this *Request) search(node *Word, index int) bool {
+func (r *Request) search(node *Word, index int) bool {
 	//only one word
-	if this.check(node, index, 0) {
+	if r.check(node, index, 0) {
 		return true
 	}
-	for i := 1; node != nil && i < len(this.content)-index; i++ {
-		c := this.content[index+i]
+	for i := 1; node != nil && i < len(r.content)-index; i++ {
+		c := r.content[index+i]
 		tmpNode := node.search(c)
 		if tmpNode == nil {
 			//filter special characters
-			if b, _ := this.filter.symb.search(c); b {
+			if b, _ := r.filter.symb.search(c); b {
 				continue
 			}
 			//is not keyword, break
@@ -52,7 +55,7 @@ func (this *Request) search(node *Word, index int) bool {
 		}
 
 		tmpNode.lk.RLock()
-		ok := this.check(tmpNode, index, i)
+		ok := r.check(tmpNode, index, i)
 		tmpNode.lk.RUnlock()
 		if ok {
 			return true
@@ -62,17 +65,17 @@ func (this *Request) search(node *Word, index int) bool {
 	return false
 }
 
-func (this *Request) check(node *Word, index, i int) bool {
+func (r *Request) check(node *Word, index, i int) bool {
 	if node == nil || !node.isLeaf {
 		return false
 	}
 
-	this.Rate += node.rate
-	this.Keywords = append(this.Keywords, Keyword{
+	r.Rate += node.rate
+	r.Keywords = append(r.Keywords, keyword.Keyword{
 		Rate:  node.rate,
 		Index: index,
 		Kind:  node.kind,
-		Word:  string(this.content[index : index+i+1]),
+		Word:  string(r.content[index : index+i+1]),
 	})
-	return this.Rate >= this.filter.Threshold
+	return r.Rate >= r.filter.Threshold
 }

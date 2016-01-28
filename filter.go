@@ -1,24 +1,21 @@
 package filter
 
 import (
-	"errors"
 	"sync"
 
-	. "github.com/miraclesu/keywords-filter/keyword"
+	"github.com/miraclesu/keywords-filter/keyword"
 	"github.com/miraclesu/keywords-filter/listener"
 	"github.com/miraclesu/keywords-filter/loader"
 )
 
-var (
-	InvalidFilter = errors.New("Invalid filter")
-)
-
+// Filter is used to build keyword trees
 type Filter struct {
 	word      *Word    // keyword
 	symb      *symbols // special symbols
 	Threshold int
 }
 
+// New a Filter
 func New(threshold int, load loader.Loader) (f *Filter, err error) {
 	kws, sbs, err := load.Load()
 	if err != nil {
@@ -36,98 +33,103 @@ func New(threshold int, load loader.Loader) (f *Filter, err error) {
 	return
 }
 
-func (this *Filter) Filter(content string) (resp *Response, err error) {
-	if this.word == nil || this.symb == nil {
-		err = InvalidFilter
-		return
-	}
-
+// Filter the content
+func (f *Filter) Filter(content string) *Response {
 	req := Request{
 		Content: content,
 	}
-	req.Init(this)
-	return req.Scan(), nil
+	req.Init(f)
+	return req.Scan()
 }
 
-func (this *Filter) AddWord(w *Keyword) {
-	if this.word == nil {
-		this.word = &Word{
+// AddWord add a keyword to the filter
+func (f *Filter) AddWord(w *keyword.Keyword) {
+	if f.word == nil {
+		f.word = &Word{
 			lk: new(sync.RWMutex),
 		}
 	}
-	this.word.addWord(w)
+	f.word.addWord(w)
 }
 
-func (this *Filter) RemoveWord(w *Keyword) {
-	if this.word == nil {
+// RemoveWord remove a keyword from the filter
+func (f *Filter) RemoveWord(w *keyword.Keyword) {
+	if f.word == nil {
 		return
 	}
-	this.word.removeWord(w)
+	f.word.removeWord(w)
 }
 
-func (this *Filter) AddWords(kws []*Keyword) {
+// AddWords add keywords to the filter
+func (f *Filter) AddWords(kws []*keyword.Keyword) {
 	for i, count := 0, len(kws); i < count; i++ {
-		this.AddWord(kws[i])
+		f.AddWord(kws[i])
 	}
 }
 
-func (this *Filter) RemoveWords(kws []*Keyword) {
+// RemoveWords remove keywords from the filter
+func (f *Filter) RemoveWords(kws []*keyword.Keyword) {
 	for i, count := 0, len(kws); i < count; i++ {
-		this.RemoveWord(kws[i])
+		f.RemoveWord(kws[i])
 	}
 }
 
-func (this *Filter) AddSymb(s string) {
-	if this.symb == nil {
-		this.symb = &symbols{
+// AddSymb add a symbol to the filter
+func (f *Filter) AddSymb(s string) {
+	if f.symb == nil {
+		f.symb = &symbols{
 			lk: new(sync.RWMutex),
 		}
 	}
 	for _, v := range s {
-		this.symb.add(v)
+		f.symb.add(v)
 	}
 }
 
-func (this *Filter) RemoveSymb(s string) {
-	if this.word == nil {
+// RemoveSymb remove a symbol from the filter
+func (f *Filter) RemoveSymb(s string) {
+	if f.word == nil {
 		return
 	}
 	for _, v := range s {
-		this.symb.remove(v)
+		f.symb.remove(v)
 	}
 }
 
-func (this *Filter) AddSymbs(sbs []string) {
+// AddSymbs add symbols to the filter
+func (f *Filter) AddSymbs(sbs []string) {
 	for i, count := 0, len(sbs); i < count; i++ {
-		this.AddSymb(sbs[i])
+		f.AddSymb(sbs[i])
 	}
 }
 
-func (this *Filter) RemoveSymbs(sbs []string) {
+// RemoveSymbs remove symbols from the filter
+func (f *Filter) RemoveSymbs(sbs []string) {
 	for i, count := 0, len(sbs); i < count; i++ {
-		this.AddSymb(sbs[i])
+		f.AddSymb(sbs[i])
 	}
 }
 
-func (this *Filter) StartListen(listen listener.Listener) {
+// StartListen start a listener to listen add or remove keywords and symbols
+func (f *Filter) StartListen(listen listener.Listener) {
 	go func() {
 		for kws := range listen.AddKeywords() {
-			this.AddWords(kws)
+			f.AddWords(kws)
 		}
 	}()
 	go func() {
 		for kws := range listen.RemoveKeywords() {
-			this.RemoveWords(kws)
+			f.RemoveWords(kws)
 		}
 	}()
 	go func() {
 		for kws := range listen.AddSymbols() {
-			this.AddSymbs(kws)
+			f.AddSymbs(kws)
 		}
 	}()
 	go func() {
 		for kws := range listen.RemoveSymbols() {
-			this.RemoveSymbs(kws)
+			f.RemoveSymbs(kws)
 		}
 	}()
 }

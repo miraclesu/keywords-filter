@@ -1,5 +1,4 @@
-## Keywords-Filter
-===========
+# Keywords-Filter
 
 [![Build Status](https://travis-ci.org/miraclesu/keywords-filter.svg?branch=master)](https://travis-ci.org/miraclesu/keywords-filter)
 
