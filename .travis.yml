@@ -7,7 +7,7 @@ before_install:
   - go get gopkg.in/mgo.v2
   - go get gopkg.in/mgo.v2/bson
   - go get github.com/garyburd/redigo/redis
-  - go get github.com/golang/lint/golint
+  - go get golang.org/x/lint/golint
 script:
   - golint
   - go test -v ./...
